@@ -372,6 +372,14 @@ def read_config(config_files=DEFAULT_CONFIG_FILE_ORDER, stdin=False):
     return config
 
 
+def print_config(conf):
+    print('Assets:')
+    for  asset in conf['assets'].values():
+        target = '{user}@{host}:{port}:{dest}'.format(
+            **conf['targets'][asset['target']])
+        print(' * {id} - {src} -> {0}{dest} ({type})'.format(target, **asset))
+
+
 def create_arguments():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -398,6 +406,8 @@ def create_arguments():
                         help="Enable debug logging.")
     parser.add_argument("-s", "--stdin", action='store_true',
                         help="Get configuration from STDIN as well.")
+    parser.add_argument("-P", "--print-config", action='store_true',
+                        help="Show current configuration of sources and targets.")
     parser.add_argument("-b", "--battery-check", action='store_true',
                         help="Enable checking for battery power before running.")
     parser.add_argument("-f", "--force", action='store_true',
@@ -413,6 +423,10 @@ def main():
     global LOG
     LOG = setup_logging(opts.log_file, opts.debug)
     conf = read_config(opts.config.split(','), opts.stdin)
+
+    if opts.print_config:
+        print_config(conf)
+        sys.exit(0)
 
     if opts.one_instance:
         verify_process_is_alone(opts.pid_file)
