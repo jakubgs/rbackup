@@ -1,7 +1,7 @@
 import os
 import sh
 import time
-import json
+import yaml
 import glob
 import select
 import atexit
@@ -106,7 +106,7 @@ def read_config_file(config_files):
         try:
             with open(config_file, 'r') as f:
                 LOG.debug('Reading config from: %s', config_file)
-                return json.load(f)
+                return yaml.load(f)
         except IOError as e:
             continue
     LOG.error('No config file found!')
@@ -125,7 +125,7 @@ def read_config_stdin():
     if not sys.stdin.isatty() and file_has_input(sys.stdin):
         LOG.warning('Reading config from STDIN...')
         try:
-            return json.load(sys.stdin)
+            return yaml.load(sys.stdin)
         except ValueError as e:
             return {}
     return {}

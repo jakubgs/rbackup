@@ -10,27 +10,19 @@ This is a small utility I've made for the purpose of automating backups with `rs
 
 Define configuration in JSON format, usually in `/etc/rbackup.json`:
 
-```json
-{
-    "assets": [
-        {
-            "id": "example",
-            "type": "rsync",
-            "src": "/tmp/example",
-            "dest": "example",
-            "target": "remote_backup",
-            "exclude": [ "Downloads", ".cache", ".local" ]
-        }
-    ], 
-    "targets": [
-        {
-            "id": "remote_backup",
-            "dest": "/mnt/backup",
-            "host": "bkp.example.com",
-            "user": "userx"
-        }
-    ]
-}
+```yaml
+assets:
+  - id: example
+    type: rsync
+    src: /tmp/example
+    dest: example
+    target: remote_backup
+    exclude: [ something, another_thing ]
+targets:
+  - id: remote_backup
+    dest: /mnt/backup
+    host: bkp.example.com
+    user: userx
 ```
 
 Now simply run the backup:
@@ -61,15 +53,15 @@ usage: script.py [-h] [-a ASSETS [ASSETS ...]] [-t TYPE] [-T TIMEOUT]
                  [-p PID_FILE] [-l LOG_FILE] [-D] [-o] [-r] [-d] [-s] [-P]
                  [-b] [-f] [-c CONFIG]
 
-This script backups directories configred as 'assets' in the JSON config file.
+This script backups directories configred as 'assets' in the YAML config file.
 
 Configuration can be also provided through standard input using --stdin flag..
 The config is merged with the one read from the file.
 
 Config file locations read in the following order:
-* /etc/rbackup.json
-* `~/.rbackup.json
-* ./rbackup.json
+* /etc/rbackup.yaml
+* `~/.rbackup.yaml
+* ./rbackup.yaml
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -91,7 +83,7 @@ optional arguments:
   -b, --battery-check   Enable checking for battery power before running.
   -f, --force           When used things like running on battery are ignored.
   -c CONFIG, --config CONFIG
-                        Location of JSON config file.
+                        Location of YAML config file.
 ```
 
 # To Do

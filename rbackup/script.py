@@ -9,7 +9,7 @@ from log import setup_logging
 
 
 HELP_MESSAGE = """
-This script backups directories configred as 'assets' in the JSON config file.
+This script backups directories configred as 'assets' in the YAML config file.
 
 Configuration can be also provided through standard input using --stdin flag..
 The config is merged with the one read from the file.
@@ -53,7 +53,7 @@ def create_arguments():
                         help="When used things like running on battery are ignored.")
     parser.add_argument("-c", "--config", type=str,
                         default=','.join(conf.DEFAULT_CONFIG_FILE_ORDER),
-                        help="Location of JSON config file.")
+                        help="Location of YAML config file.")
     return parser.parse_args()
 
 
