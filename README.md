@@ -2,6 +2,10 @@
 
 This is a small utility I've made for the purpose of automating backups with `rsync` & `tar`.
 
+# Installation
+
+**TODO**
+
 # Usage
 
 Define configuration in JSON format, usually in `/etc/rbackup.json`:
@@ -9,11 +13,11 @@ Define configuration in JSON format, usually in `/etc/rbackup.json`:
 ```json
 {
     "assets": {
-        "home": {
-            "id": "home",
+        "example": {
+            "id": "example",
             "type": "rsync",
-            "src": "/home/my_user/",
-            "dest": "homes/my_user",
+            "src": "/tmp/example",
+            "dest": "example",
             "target": "remote_backup",
             "exclude": [ "Downloads", ".cache", ".local" ]
         }
@@ -22,8 +26,8 @@ Define configuration in JSON format, usually in `/etc/rbackup.json`:
         "remote_backup": {
             "id": "remote_backup",
             "dest": "/mnt/backup",
-            "host": "some.host.i.own",
-            "user": "some_user"
+            "host": "bkp.example.com",
+            "user": "userx"
         }
     }
 }
@@ -32,11 +36,22 @@ Define configuration in JSON format, usually in `/etc/rbackup.json`:
 Now simply run the backup:
 
 ```bash
-$ rbackup --asset home   
-2017-12-15 18:09:15,119 - INFO: Starting rsync: /home/my_user -> some_user@some.host.i.own:22:/mnt/backup/homes/my_user
-2017-12-15 18:09:15,535 - INFO: Finished in: 1.42s
-2017-12-15 18:09:15,535 - INFO: sent 1.22M bytes  received 11 bytes  2.45M bytes/sec
-2017-12-15 18:09:15,535 - INFO: total size is 360.01M  speedup is 294.13
+$ rbackup --asset example
+2017-12-15 18:09:15,119 - INFO: Starting rsync: /tmp/example -> userx@bkp.example.com:/mnt/backup/example
+2017-12-15 20:49:03,986 - INFO: Finished in: 6.22s
+2017-12-15 20:49:03,987 - INFO: sent 20.36K bytes  received 15 bytes  3.13K bytes/sec
+2017-12-15 20:49:03,987 - INFO: total size is 20.21M  speedup is 991.80
+```
+
+Or restore:
+
+```bash
+$ rbackup --asset example --restore
+2017-12-15 20:49:24,590 - WARNING: Enabled RESTORE mode!
+2017-12-15 20:49:30,518 - INFO: Starting rsync: userx@bkp.example.com:/mnt/backup/example -> /tmp/example
+2017-12-15 20:49:41,237 - INFO: Finished in: 10.72s
+2017-12-15 20:49:41,237 - INFO: sent 8.41K bytes  received 20.25M bytes  1.76M bytes/sec
+2017-12-15 20:49:41,238 - INFO: total size is 20.21M  speedup is 1.00
 ```
 
 # Help

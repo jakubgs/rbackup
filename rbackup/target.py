@@ -94,8 +94,6 @@ class Target(object):
             return os.path.join(self.dest, asset.dest)
 
     def _bake_rsync_for_target(self, asset, timeout=None, restore=False):
-        dest_full = self._make_full_dest(asset)
-
         # prepare the rsync command
         rsync = sh.rsync.bake(archive=True,
                               recursive=True,
@@ -117,12 +115,7 @@ class Target(object):
             for entry in asset.exclude:
                 rsync = rsync.bake(exclude=entry)
 
-        # add main arguments, source and destination
-        if restore:
-            rsync = rsync.bake(dest_full, asset.src)
-        else:
-            rsync = rsync.bake(asset.src, dest_full)
-        return rsync, dest_full
+        return rsync
 
     def sync(self, asset, timeout, restore=False, dryrun=False):
         if asset.type == 'rsync':
@@ -133,15 +126,21 @@ class Target(object):
             raise Exception('No backup type specified for asset: %s', asset.id)
 
     def rsync(self, asset, timeout, restore=False, dryrun=False):
-        rsync_full, dest_full = self._bake_rsync_for_target(
-                                   asset, timeout=timeout, restore=restore)
+        dest_full = self._make_full_dest(asset)
+        rsync = self._bake_rsync_for_target(asset, timeout, restore)
 
-        LOG.info('Starting rsync: %s -> %s',
-                 asset.src, dest_full)
+        # add main arguments, source and destination
+        if restore:
+            rsync = rsync.bake(dest_full, asset.src)
+            LOG.info('Starting rsync: %s -> %s', dest_full, asset.src)
+        else:
+            rsync = rsync.bake(asset.src, dest_full)
+            LOG.info('Starting rsync: %s -> %s', asset.src, dest_full)
+
         if dryrun:
             return
 
-        rsync_proc = util.execute(rsync_full, timeout)
+        rsync_proc = util.execute(rsync, timeout)
         if rsync_proc is not None:
             self._log_rsync_stats(rsync_proc.stdout)
             return rsync_proc.stdout
