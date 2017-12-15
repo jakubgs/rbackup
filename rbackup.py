@@ -375,8 +375,11 @@ def read_config(config_files=DEFAULT_CONFIG_FILE_ORDER, stdin=False):
 def print_config(conf):
     print('Assets:')
     for  asset in conf['assets'].values():
-        target = '{user}@{host}:{port}:{dest}'.format(
-            **conf['targets'][asset['target']])
+        if asset.get('target', 'local') == 'local':
+            target = ''
+        else:
+            target = '{user}@{host}:{port}:{dest}'.format(
+                **conf['targets'][asset['target']])
         print(' * {id} - {src} -> {0}{dest} ({type})'.format(target, **asset))
 
 
@@ -438,7 +441,11 @@ def main():
     if opts.restore:
         LOG.warning('Enabled RESTORE mode!')
 
-    targets = dict()
+    # always have local target available
+    targets = {
+        'local': Target('local', '/', user=getuser(),
+                        host=None, port=None, ping=False),
+    }
     for target in conf['targets'].itervalues():
         targets[target['id']] = Target.from_dict(target)
 
