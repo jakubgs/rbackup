@@ -37,21 +37,21 @@ Now simply run the backup:
 
 ```bash
 $ rbackup --asset example
-2017-12-15 18:09:15,119 - INFO: Starting rsync: /tmp/example -> userx@bkp.example.com:/mnt/backup/example
-2017-12-15 20:49:03,986 - INFO: Finished in: 6.22s
-2017-12-15 20:49:03,987 - INFO: sent 20.36K bytes  received 15 bytes  3.13K bytes/sec
-2017-12-15 20:49:03,987 - INFO: total size is 20.21M  speedup is 991.80
+INFO: Starting rsync: /tmp/example -> userx@bkp.example.com:/mnt/backup/example
+INFO: Finished in: 6.22s
+INFO: sent 20.36K bytes  received 15 bytes  3.13K bytes/sec
+INFO: total size is 20.21M  speedup is 991.80
 ```
 
 Or restore:
 
 ```bash
 $ rbackup --asset example --restore
-2017-12-15 20:49:24,590 - WARNING: Enabled RESTORE mode!
-2017-12-15 20:49:30,518 - INFO: Starting rsync: userx@bkp.example.com:/mnt/backup/example -> /tmp/example
-2017-12-15 20:49:41,237 - INFO: Finished in: 10.72s
-2017-12-15 20:49:41,237 - INFO: sent 8.41K bytes  received 20.25M bytes  1.76M bytes/sec
-2017-12-15 20:49:41,238 - INFO: total size is 20.21M  speedup is 1.00
+WARNING: Enabled RESTORE mode!
+INFO: Starting rsync: userx@bkp.example.com:/mnt/backup/example -> /tmp/example
+INFO: Finished in: 10.72s
+INFO: sent 8.41K bytes  received 20.25M bytes  1.76M bytes/sec
+INFO: total size is 20.21M  speedup is 1.00
 ```
 
 # Help
