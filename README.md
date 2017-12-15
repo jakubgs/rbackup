@@ -11,12 +11,12 @@ Define configuration in JSON format:
     "assets": {
         "home": {
             "id": "home",
-            "type": "rsync"
+            "type": "rsync",
             "src": "/home/my_user/",
             "dest": "homes/my_user",
             "target": "remote_backup",
-            "exclude": [ "Downloads", ".cache", ".local" ],
-        },
+            "exclude": [ "Downloads", ".cache", ".local" ]
+        }
     }, 
     "targets": {
         "remote_backup": {
