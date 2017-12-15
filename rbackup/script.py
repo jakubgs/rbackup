@@ -24,8 +24,8 @@ def create_arguments():
         formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description=HELP_MESSAGE)
 
-    parser.add_argument(
-        "-a", "--assets", nargs='+', type=str, default=conf.DEFAULT_PID_FILE,
+    parser.add_argument( "-a", "--assets", nargs='+', type=str,
+                        default=conf.DEFAULT_PID_FILE,
                         help="List of assets to process.")
     parser.add_argument("-t", "--type", type=str,
                         help="Type of backup to execute: rsync / tar")
@@ -80,15 +80,15 @@ def main():
     targets = {
         'local': Target('local', '/', host=None, port=None, ping=False),
     }
-    for target in conf['targets'].itervalues():
+    for target in conf['targets']:
         targets[target['id']] = Target.from_dict(target)
 
-    assets = conf['assets']
-    if opts.assets:
-        assets = {k: v for k, v in conf['assets'].iteritems()
-                  if k in opts.assets}
-    for asset_dict in assets.itervalues():
-        asset = Asset.from_dict(asset_dict)
+    assets = {}
+    for asset_dict in conf['assets']:
+        assets[asset_dict['id']] = Asset.from_dict(asset_dict)
+
+    for asset_id in opts.assets:
+        asset = assets.get(asset_id)
         target = targets.get(asset.target)
 
         if target is None:

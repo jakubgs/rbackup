@@ -12,8 +12,8 @@ Define configuration in JSON format, usually in `/etc/rbackup.json`:
 
 ```json
 {
-    "assets": {
-        "example": {
+    "assets": [
+        {
             "id": "example",
             "type": "rsync",
             "src": "/tmp/example",
@@ -21,15 +21,15 @@ Define configuration in JSON format, usually in `/etc/rbackup.json`:
             "target": "remote_backup",
             "exclude": [ "Downloads", ".cache", ".local" ]
         }
-    }, 
-    "targets": {
-        "remote_backup": {
+    ], 
+    "targets": [
+        {
             "id": "remote_backup",
             "dest": "/mnt/backup",
             "host": "bkp.example.com",
             "user": "userx"
         }
-    }
+    ]
 }
 ```
 
