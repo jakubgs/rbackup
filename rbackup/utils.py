@@ -1,4 +1,5 @@
 import os
+import sys
 import yaml
 import glob
 import select
@@ -31,33 +32,33 @@ def check_process(pid_file):
     if os.path.isfile(pid_file):
         pid = None
         with open(pid_file, 'r') as f:
-            pid = f.read()
+            pid = int(f.read())
         if proc_exists(pid):
-            return True, True
+            return True, pid
         else:
-            return True, False
+            return True, None
 
     else:
         with open(pid_file, 'w') as f:
             f.write(str(os.getpid())[:-1])
-        return False, False
+        return False, None
 
 
 def exit_handler():
     os.remove(conf.DEFAULT_PID_FILE)
 
 
-def verify_process_is_alone(pid_file):
+def verify_process_is_alone(pid_file, force=False):
     atexit.register(exit_handler)
-    file_is, process_is = check_process(pid_file)
-    if file_is and process_is:
-        log.warning(
+    file_is, pid = check_process(pid_file)
+    if file_is and pid:
+        LOG.warning(
             'Process already in progress: {} ({})'.format(pid, pid_file))
         sys.exit(0)
-    elif file_is and not process_is:
-        log.warning('Pid file process is dead: {} ({})'.format(pid, pid_file))
-        if args.force:
-            log.warning('Removing: {}'.format(pid_file))
+    elif file_is and not pid:
+        LOG.warning('Pid file process is dead: {} ({})'.format(pid, pid_file))
+        if force:
+            LOG.warning('Removing: {}'.format(pid_file))
             exit_handler()
         else:
             sys.exit(0)

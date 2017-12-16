@@ -25,6 +25,7 @@ setup(
     # dependencies
     install_requires=[
         'sh',
+        'pyyaml',
     ],
     setup_requires=[
         'mock'

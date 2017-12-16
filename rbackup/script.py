@@ -67,7 +67,7 @@ def main():
         sys.exit(0)
 
     if opts.one_instance:
-        util.verify_process_is_alone(opts.pid_file)
+        util.verify_process_is_alone(opts.pid_file, force=opts.force)
 
     if opts.battery_check and not opts.force and util.on_battery():
         LOG.warning('System running on battery. Aborting.')
