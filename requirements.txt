@@ -1,2 +1,3 @@
 sh>=1
 pytest>=2
+pytest_cov>=2

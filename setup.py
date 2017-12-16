@@ -14,6 +14,7 @@ setup(
     url='https://github.com/PonderingGrower/rbackup',
 
     test_suite='test',
+    tests_require=['pytest'],
 
     entry_points={
         'console_scripts': [
@@ -26,6 +27,7 @@ setup(
         'sh>=1',
     ],
     setup_requires=[
-        'pytest>=2'
+        'pytest>=2',
+        'pytest_cov>=2',
     ]
 )

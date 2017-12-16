@@ -1,4 +1,6 @@
-# Description [![Build Status](https://travis-ci.org/PonderingGrower/rbackup.svg?branch=master)](https://travis-ci.org/PonderingGrower/rbackup)
+# Description
+
+[![Build Status](https://travis-ci.org/PonderingGrower/rbackup.svg?branch=master)](https://travis-ci.org/PonderingGrower/rbackup) [![codecov](https://codecov.io/gh/PonderingGrower/rbackup/branch/master/graph/badge.svg)](https://codecov.io/gh/PonderingGrower/rbackup)
 
 This is a small utility I've made for the purpose of automating backups with `rsync` & `tar`.
 
