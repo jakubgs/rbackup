@@ -104,5 +104,8 @@ optional arguments:
 
 # To Do
 
+* Unit tests
+* Functional tests
+* More sane restore mode
 * More types of backups
 * More custom options for `tar` and `rsync`
