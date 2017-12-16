@@ -72,8 +72,14 @@ def read_config_file(config_files):
                 return yaml.load(f)
         except IOError as e:
             continue
-    LOG.error('No config file found!')
-    sys.exit(1)
+
+
+def read_config(config_files=conf.DEFAULT_CONFIG_FILE_ORDER, stdin=False):
+    config = {}
+    config.update(read_config_file(config_files))
+    if stdin:
+        config.update(read_config_stdin())
+    return config
 
 
 def parse_config(config):
@@ -92,7 +98,7 @@ def parse_config(config):
 
 
 def file_has_input(file):
-    r, w, x = select.select([file], [], [], 0)
+    r, _, _ = select.select([file], [], [], 0)
     if r:
         return True
     else:
@@ -100,29 +106,27 @@ def file_has_input(file):
 
 
 def read_config_stdin():
-    if not sys.stdin.isatty() and file_has_input(sys.stdin):
-        LOG.warning('Reading config from STDIN...')
-        try:
-            return yaml.load(sys.stdin)
-        except ValueError as e:
-            return {}
-    return {}
+    if sys.stdin.isatty():
+        LOG.warning('STDIN is a terminal, ignoring!')
+        return {}
+    if not file_has_input(sys.stdin):
+        LOG.warning('No input found in STDIN!')
+        return {}
+
+    LOG.warning('Reading config from STDIN...')
+    try:
+        return yaml.load(sys.stdin)
+    except ValueError as e:
+        return {}
 
 
-def read_config(config_files=conf.DEFAULT_CONFIG_FILE_ORDER, stdin=False):
-    config = {}
-    config.update(read_config_file(config_files))
-    if stdin:
-        config.update(read_config_stdin())
-    return config
-
-
-def print_config(conf):
+def print_config(assets, targets):
     print('Assets:')
-    for  asset in conf['assets'].values():
-        if asset.get('target', 'local') == 'local':
+    for  asset in assets.values():
+        if asset.target == 'local':
             target = ''
         else:
             target = '{user}@{host}:{port}:{dest}'.format(
-                **conf['targets'][asset['target']])
-        print(' * {id} - {src} -> {0}{dest} ({type})'.format(target, **asset))
+                **vars(targets[asset.target]))
+        print(' * {id} - {src} -> {0}{dest} ({type})'.format(
+            target, **vars(asset)))

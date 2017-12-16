@@ -60,10 +60,14 @@ def main():
     LOG = setup_logging(opts.log_file, debug=opts.debug)
 
     conf = util.read_config(opts.config.split(','), opts.stdin)
+    if not conf:
+        LOG.error('No config file found!')
+        sys.exit(1)
+
     assets, targets = util.parse_config(conf)
 
     if opts.print_config:
-        util.print_config(conf)
+        util.print_config(assets, targets)
         sys.exit(0)
 
     if opts.one_instance and not util.process_is_alone(opts.pid_file, force=opts.force):
