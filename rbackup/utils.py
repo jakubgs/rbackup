@@ -21,17 +21,27 @@ def signal_handler(signum, frame):
 
 
 
-def execute(command, timeout):
+def execute(command, piped=None, timeout=None):
     LOG.debug('CMD: %s', command)
+    if piped:
+        LOG.debug('PIPED: %s', piped)
 
-    # prepare timer to kill command if it runs too long
-    signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(timeout)
-    LOG.debug('Command timeout: %s', timeout)
+    if timeout:
+        # prepare timer to kill command if it runs too long
+        signal.signal(signal.SIGALRM, signal_handler)
+        signal.alarm(timeout)
+        LOG.debug('Command timeout: %s', timeout)
+
     try:
         start = time.time()
-        proc = command(_bg=True)
+
+        if piped:
+            proc = command(piped(), _bg=True)
+        else:
+            proc = command(_bg=True)
+            
         proc.wait()
+
         end = time.time()
     except KeyboardInterrupt as e:
         LOG.warning('Command stopped by KeyboardInterrupt!')

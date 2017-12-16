@@ -151,20 +151,17 @@ class Target(object):
                           to_stdout=True, warning='no-file-changed')
         for exc_pattern in asset.exclude:
             tar = tar.bake(exclude=exc_pattern)
-        tar = tar.bake(asset.src)
-        cat = sh.cat.bake('> {}'.format(dest_full))
+        tar = tar.bake(asset.src, _piped=True)
+        command = sh.cat.bake('> {}'.format(dest_full))
         if self.host:
             ssh = sh.ssh.bake(
                 '{}@{}'.format(self.user, self.host), p=self.port)
-            LOG.debug(str(cat))
-            ssh_pipe = ssh.bake(str(cat))
-            command = ssh_pipe.bake(tar, _piped=True)
-        else:
-            command = cat.bake(tar, _piped=True)
+            LOG.debug(str(command))
+            command = ssh.bake(str(command))
 
         LOG.info('Starting sync: %s -> TarGZ -> %s@%s:%s:%s',
                  asset.src, self.user, self.host, self.port, dest_full)
         if dryrun:
             return
 
-        return util.execute(command, timeout)
+        return util.execute(command, piped=tar, timeout=timeout)
