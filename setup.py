@@ -24,10 +24,11 @@ setup(
 
     # dependencies
     install_requires=[
-        'sh>=1',
+        'sh',
     ],
     setup_requires=[
-        'pytest>=2',
-        'pytest_cov>=2',
+        'mock'
+        'pytest',
+        'pytest_cov',
     ]
 )

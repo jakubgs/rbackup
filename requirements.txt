@@ -1,4 +1,5 @@
 sh
+mock
 pytest
 pytest_cov
 codecov
