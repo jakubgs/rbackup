@@ -4,10 +4,10 @@ import glob
 import select
 import atexit
 
-from asset import Asset
-from target import Target
-import config as conf
-from log import LOG
+from .asset import Asset
+from .target import Target
+from .log import LOG
+from . import config as conf
 
 
 def on_battery():
@@ -15,13 +15,11 @@ def on_battery():
         with open(bat_stat_file) as f:
             if f.read().rstrip() == 'Discharging':
                 return True
-
-
-def exit_handler():
-    os.remove(DEFAULT_PID_FILE)
+    return False
 
 
 def proc_exists(pid):
+    assert isinstance(pid, int)
     try:
         os.kill(pid, 0)
     except Exception as e:
@@ -43,6 +41,10 @@ def check_process(pid_file):
         with open(pid_file, 'w') as f:
             f.write(str(os.getpid())[:-1])
         return False, False
+
+
+def exit_handler():
+    os.remove(conf.DEFAULT_PID_FILE)
 
 
 def verify_process_is_alone(pid_file):

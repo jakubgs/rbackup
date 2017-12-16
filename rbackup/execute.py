@@ -1,7 +1,7 @@
 import sh
 import time
 import signal
-from log import LOG
+from .log import LOG
 
 class TimeoutException(Exception):
     pass
