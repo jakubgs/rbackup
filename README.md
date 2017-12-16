@@ -15,7 +15,8 @@ Or clone it, and build it by hand:
 ```bash
 git clone https://github.com/PonderingGrower/rbackup
 cd rbackup
-python setup.py sdist
+./setup.py test
+./setup.py sdist
 pip install dist/rbackup-0.1.tar.gz
 ```
 

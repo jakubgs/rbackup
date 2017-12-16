@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from setuptools import setup, find_packages
 
 setup(
@@ -11,6 +12,8 @@ setup(
     license='PSF',
     keywords='backup rsync tar tarball automating',
 
+    test_suite='test',
+
     entry_points={
         'console_scripts': [
             'rbackup = rbackup.script:main'
@@ -19,7 +22,7 @@ setup(
 
     # dependencies
     install_requires=[
-        'sh>=1.12',
+        'sh>=1',
     ],
     setup_requires=[
         'pytest>=2'
