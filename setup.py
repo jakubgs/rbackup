@@ -11,7 +11,7 @@ setup(
     description='Utility for automating backups with tar & rsync.',
     license='PSF',
     keywords='backup rsync tar tarball automating',
-    url='https://github.com/PonderingGrower/rbackup'
+    url='https://github.com/PonderingGrower/rbackup',
 
     test_suite='test',
 
