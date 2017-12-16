@@ -3,6 +3,7 @@ import sys
 from getpass import getuser
 
 from log import LOG
+from execute import execute
 import config as conf
 import utils as util
 try:
@@ -15,10 +16,10 @@ except ImportError:
 class Target(object):
 
     def __init__(self, id, dest, user=getuser(), host='localhost', port=22, ping=False):
+        assert id is not None
+        assert dest is not None
         self.id = id
-        assert self.id is not None
         self.dest = dest
-        assert self.dest is not None
         self.user = user
         self.host = host
         self.port = port
@@ -140,7 +141,7 @@ class Target(object):
         if dryrun:
             return
 
-        rsync_proc = util.execute(rsync, timeout)
+        rsync_proc = execute(rsync, timeout)
         if rsync_proc is not None:
             self._log_rsync_stats(rsync_proc.stdout)
             return rsync_proc.stdout
@@ -164,4 +165,4 @@ class Target(object):
         if dryrun:
             return
 
-        return util.execute(command, piped=tar, timeout=timeout)
+        return execute(command, piped=tar, timeout=timeout)
