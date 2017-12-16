@@ -1,8 +1,6 @@
 import sys
 import argparse
 
-from asset import Asset
-from target import Target
 import utils as util 
 import config as conf
 from log import setup_logging
@@ -60,7 +58,9 @@ def create_arguments():
 def main():
     opts = create_arguments()
     LOG = setup_logging(opts.log_file, opts.debug)
+
     conf = util.read_config(opts.config.split(','), opts.stdin)
+    assets, targets = util.parse_config(conf)
 
     if opts.print_config:
         util.print_config(conf)
@@ -76,24 +76,16 @@ def main():
     if opts.restore:
         LOG.warning('Enabled RESTORE mode!')
 
-    # always have local target available
-    targets = {
-        'local': Target('local', '/', host=None, port=None, ping=False),
-    }
-    for target in conf['targets']:
-        targets[target['id']] = Target.from_dict(target)
-
-    assets = {}
-    for asset_dict in conf['assets']:
-        assets[asset_dict['id']] = Asset.from_dict(asset_dict)
-
     for asset_id in opts.assets:
         asset = assets.get(asset_id)
-        target = targets.get(asset.target)
 
+        if asset is None:
+            LOG.error('No such asset exists in config: %s', asset_id)
+            continue
+
+        target = targets.get(asset.target)
         if target is None:
-            LOG.error(
-                'Invalid target for asset %s: %s', asset.id, asset.target)
+            LOG.error('Invalid target for asset %s: %s', asset.id, asset.target)
             continue
         if not target.available() and not opts.force:
             LOG.error('Skipping asset: %s', asset.id)

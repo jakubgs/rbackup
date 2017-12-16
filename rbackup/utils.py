@@ -6,6 +6,9 @@ import glob
 import select
 import atexit
 import signal
+
+from asset import Asset
+from target import Target
 import config as conf
 from log import LOG
 
@@ -111,6 +114,21 @@ def read_config_file(config_files):
             continue
     LOG.error('No config file found!')
     sys.exit(1)
+
+
+def parse_config(config):
+    # always have local target available
+    targets = {
+        'local': Target('local', '/', host=None, port=None, ping=False),
+    }
+    for target in config['targets']:
+        targets[target['id']] = Target.from_dict(target)
+
+    assets = {}
+    for asset_dict in config['assets']:
+        assets[asset_dict['id']] = Asset.from_dict(asset_dict)
+
+    return (assets, targets)
 
 
 def file_has_input(file):
