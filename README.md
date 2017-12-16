@@ -2,6 +2,8 @@
 
 This is a small utility I've made for the purpose of automating backups with `rsync` & `tar`.
 
+**WARNING:** This package is not yet stable. Use at own peril.
+
 # Installation
 
 Not available in PyPi yet so you have to install from GitHub:
@@ -63,9 +65,9 @@ INFO: total size is 20.21M  speedup is 1.00
 # Help
 
 ```
-usage: script.py [-h] [-a ASSETS [ASSETS ...]] [-t TYPE] [-T TIMEOUT]
-                 [-p PID_FILE] [-l LOG_FILE] [-D] [-o] [-r] [-d] [-s] [-P]
-                 [-b] [-f] [-c CONFIG]
+usage: rbackup [-h] [-a ASSETS [ASSETS ...]] [-t TYPE] [-T TIMEOUT]
+               [-p PID_FILE] [-l LOG_FILE] [-D] [-o] [-r] [-d] [-s] [-P] [-b]
+               [-f] [-c CONFIG]
 
 This script backups directories configred as 'assets' in the YAML config file.
 
@@ -74,7 +76,7 @@ The config is merged with the one read from the file.
 
 Config file locations read in the following order:
 * /etc/rbackup.yaml
-* `~/.rbackup.yaml
+* /home/sochan/rbackup.yaml
 * ./rbackup.yaml
 
 optional arguments:
