@@ -66,8 +66,9 @@ def main():
         util.print_config(conf)
         sys.exit(0)
 
-    if opts.one_instance:
-        util.verify_process_is_alone(opts.pid_file, force=opts.force)
+    if opts.one_instance and not util.process_is_alone(opts.pid_file, force=opts.force):
+        LOG.warning('Aborting due to use of --one-instance')
+        sys.exit(1)
 
     if opts.battery_check and not opts.force and util.on_battery():
         LOG.warning('System running on battery. Aborting.')

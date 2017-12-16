@@ -48,20 +48,20 @@ def exit_handler():
     os.remove(conf.DEFAULT_PID_FILE)
 
 
-def verify_process_is_alone(pid_file, force=False):
+def process_is_alone(pid_file, force=False):
     atexit.register(exit_handler)
     file_is, pid = check_process(pid_file)
     if file_is and pid:
-        LOG.warning(
-            'Process already in progress: {} ({})'.format(pid, pid_file))
-        sys.exit(0)
+        LOG.warning('Process already in progress: %s (%s)', pid, pid_file)
+        return False
     elif file_is and not pid:
-        LOG.warning('Pid file process is dead: {} ({})'.format(pid, pid_file))
+        LOG.warning('Pid file process is dead: %s (%s)', pid, pid_file)
         if force:
-            LOG.warning('Removing: {}'.format(pid_file))
+            LOG.warning('FORCE mode in effect. Removing: %s', pid_file)
             exit_handler()
         else:
-            sys.exit(0)
+            return False
+    return True
 
 
 def read_config_file(config_files):
