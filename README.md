@@ -76,7 +76,7 @@ The config is merged with the one read from the file.
 
 Config file locations read in the following order:
 * /etc/rbackup.yaml
-* /home/sochan/rbackup.yaml
+* ~/rbackup.yaml
 * ./rbackup.yaml
 
 optional arguments:
