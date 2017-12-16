@@ -1,4 +1,4 @@
-# Description
+# Description [![Build Status](https://travis-ci.org/PonderingGrower/rbackup.svg?branch=master)](https://travis-ci.org/PonderingGrower/rbackup)
 
 This is a small utility I've made for the purpose of automating backups with `rsync` & `tar`.
 
