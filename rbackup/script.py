@@ -57,7 +57,7 @@ def create_arguments():
 
 def main():
     opts = create_arguments()
-    LOG = setup_logging(opts.log_file, opts.debug)
+    LOG = setup_logging(opts.log_file, debug=opts.debug)
 
     conf = util.read_config(opts.config.split(','), opts.stdin)
     assets, targets = util.parse_config(conf)

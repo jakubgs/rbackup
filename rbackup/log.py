@@ -6,7 +6,7 @@ LOG = logging.getLogger('backup')
 STDOUT_FORMAT = '%(levelname)s: %(message)s'
 FILE_FORMAT = '%(asctime)s - {}'.format(STDOUT_FORMAT)
 
-def setup_logging(log_file, debug):
+def setup_logging(log_file, debug=False):
     logging.basicConfig(format=STDOUT_FORMAT)
 
     log = logging.getLogger('backup')
