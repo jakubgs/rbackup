@@ -11,7 +11,6 @@ setup(
     license='PSF',
     keywords='backup rsync tar tarball automating',
 
-    scripts=['rbackup'],
     entry_points={
         'console_scripts': [
             'rbackup = rbackup.script:main'

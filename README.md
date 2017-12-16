@@ -4,7 +4,20 @@ This is a small utility I've made for the purpose of automating backups with `rs
 
 # Installation
 
-**TODO**
+Not available in PyPi yet so you have to install from GitHub:
+
+```bash
+pip install git+https://github.com/PonderingGrower/rbackup
+```
+
+Or clone it, and build it by hand:
+
+```bash
+git clone https://github.com/PonderingGrower/rbackup
+cd rbackup
+python setup.py sdist
+pip install dist/rbackup-0.1.tar.gz
+```
 
 # Usage
 
