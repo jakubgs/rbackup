@@ -8,7 +8,7 @@ This is a small utility I've made for the purpose of automating backups with `rs
 
 # Usage
 
-Define configuration in JSON format, usually in `/etc/rbackup.json`:
+Define configuration in YAML format, usually in `/etc/rbackup.yaml`:
 
 ```yaml
 assets:
