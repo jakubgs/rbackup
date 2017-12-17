@@ -13,6 +13,8 @@ setup(
     keywords='backup rsync tar tarball automating',
     url='https://github.com/PonderingGrower/rbackup',
 
+    python_requires='>=2.7,>=3.5',
+
     test_suite='test',
     tests_require=['pytest'],
 
