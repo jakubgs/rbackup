@@ -24,21 +24,21 @@ def PMock(wait=None):
     return m
 
 @mark.parametrize(
-    ['command', 'proc',                'piped', 'timeout', 'expected'], [
-    (Mock(),    PMock(),               None,    None,      True),
-    (Mock(),    PMock(),               Mock(),  None,      True),
-    (Mock(),    PMock(wait=KBInter()), None,    None,      None),
-    (Mock(),    PMock(wait=KBInter()), Mock(),  None,      None),
-    (Mock(),    PMock(wait=TOutExc()), None,    1000,      None),
-    (Mock(),    PMock(wait=TOutExc()), None,    1000,      None),
-    (Mock(),    PMock(wait=TOutExc()), Mock(),  1000,      None),
-    (Mock(),    PMock(wait=SHError()), None,    None,      None),
-    (Mock(),    PMock(wait=SHError()), Mock(),  None,      None),
+    ['proc',                'piped', 'timeout', 'expected'], [
+    (PMock(),               None,    None,      True),
+    (PMock(),               Mock(),  None,      True),
+    (PMock(wait=KBInter()), None,    None,      None),
+    (PMock(wait=KBInter()), Mock(),  None,      None),
+    (PMock(wait=TOutExc()), None,    1000,      None),
+    (PMock(wait=TOutExc()), None,    1000,      None),
+    (PMock(wait=TOutExc()), Mock(),  1000,      None),
+    (PMock(wait=SHError()), None,    None,      None),
+    (PMock(wait=SHError()), Mock(),  None,      None),
 ])
 @patch('rbackup.execute.signal')
-def test_execute(m_signal, command, proc, piped, timeout, expected):
-    command.return_value = proc
-    rval = execute(command, piped, timeout)
+def test_execute(m_signal, proc, piped, timeout, expected):
+    m_cmd = Mock(return_value=proc)
+    rval = execute(m_cmd, piped, timeout)
     if expected is None:
         assert rval is None
     else:
