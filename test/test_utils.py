@@ -1,7 +1,6 @@
 import sys
 from pytest import raises, mark
 from mock import Mock, patch, mock_open
-from unittest import TestCase
 
 import rbackup.utils as util
 from rbackup.asset import Asset
