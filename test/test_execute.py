@@ -17,25 +17,35 @@ def test_signal_handler():
     with raises(TOutExc):
         signal_handler(None, None)
 
+def PMock(wait=None):
+    m = Mock()
+    if wait:
+        m.wait = Mock(side_effect=wait)
+    return m
+
 @mark.parametrize(
-    ['command', 'proc',                      'piped', 'timeout'], [
-    (Mock(),    Mock(),                      None,     None),
-    (Mock(),    Mock(),                      Mock(),   None),
-    (Mock(),    Mock(),                      Mock(),   1000),
-    (Mock(),    Mock(side_effect=KBInter()), None,     None),
-    (Mock(),    Mock(side_effect=KBInter()), Mock(),   None),
-    (Mock(),    Mock(side_effect=KBInter()), Mock(),   1000),
-    (Mock(),    Mock(side_effect=TOutExc()), None,     None),
-    (Mock(),    Mock(side_effect=TOutExc()), None,     1000),
-    (Mock(),    Mock(side_effect=TOutExc()), Mock(),   1000),
-    (Mock(),    Mock(side_effect=SHError()), None,     None),
-    (Mock(),    Mock(side_effect=SHError()), Mock(),   None),
-    (Mock(),    Mock(side_effect=SHError()), Mock(),   1000),
+    ['command', 'proc',                'piped', 'timeout', 'expected'], [
+    (Mock(),    PMock(),               None,    None,      True),
+    (Mock(),    PMock(),               Mock(),  None,      True),
+    (Mock(),    PMock(wait=KBInter()), None,    None,      None),
+    (Mock(),    PMock(wait=KBInter()), Mock(),  None,      None),
+    (Mock(),    PMock(wait=TOutExc()), None,    1000,      None),
+    (Mock(),    PMock(wait=TOutExc()), None,    1000,      None),
+    (Mock(),    PMock(wait=TOutExc()), Mock(),  1000,      None),
+    (Mock(),    PMock(wait=SHError()), None,    None,      None),
+    (Mock(),    PMock(wait=SHError()), Mock(),  None,      None),
 ])
-@patch('rbackup.execute.sh')
 @patch('rbackup.execute.signal')
-def test_execute(m_signal, m_sh, command, proc, piped, timeout):
+def test_execute(m_signal, command, proc, piped, timeout, expected):
     command.return_value = proc
     rval = execute(command, piped, timeout)
-    assert rval == proc
+    if expected is None:
+        assert rval is None
+    else:
+        assert rval == proc
+    print('WAT:', type(proc.side_effect))
+    print('WTF:', isinstance(proc.side_effect, SHError))
+    if proc.side_effect and not isinstance(proc.side_effect, SHError):
+        assert proc.terminate.called
+        assert proc.kill.called
 
