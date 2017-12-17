@@ -5,10 +5,10 @@ import glob
 import select
 import atexit
 
-from .asset import Asset
-from .target import Target
-from .log import LOG
-from . import config as conf
+from rbackup import config
+from rbackup.log import LOG
+from rbackup.asset import Asset
+from rbackup.target import Target
 
 
 def on_battery():
@@ -45,7 +45,7 @@ def check_process(pid_file):
 
 
 def exit_handler():
-    os.remove(conf.DEFAULT_PID_FILE)
+    os.remove(config.DEFAULT_PID_FILE)
 
 
 def process_is_alone(pid_file, force=False):
@@ -74,7 +74,7 @@ def read_config_file(config_files):
             continue
 
 
-def read_config(config_files=conf.DEFAULT_CONFIG_FILE_ORDER, stdin=False):
+def read_config(config_files=config.DEFAULT_CONFIG_FILE_ORDER, stdin=False):
     config = {}
     config.update(read_config_file(config_files))
     if stdin:

@@ -30,7 +30,7 @@ setup(
         'pyyaml',
     ],
     setup_requires=[
-        'mock'
+        'mock',
         'pytest',
         'pytest_cov',
     ]

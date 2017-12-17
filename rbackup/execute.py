@@ -1,7 +1,8 @@
 import sh
 import time
 import signal
-from .log import LOG
+
+from rbackup.log import LOG
 
 class TimeoutException(Exception):
     pass

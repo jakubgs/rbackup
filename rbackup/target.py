@@ -4,13 +4,9 @@ import sh
 import sys
 from getpass import getuser
 
-from .log import LOG
-from .execute import execute
-# necessary to support python 2.7
-try:
-    import config as conf
-except:
-    from . import config as conf
+from rbackup import config
+from rbackup.log import LOG
+from rbackup.execute import execute
 
 
 class Target(object):
@@ -58,7 +54,7 @@ class Target(object):
             return False
         return True
 
-    def _ping_check(self, min_ping=conf.DEFAULT_MINIMAL_PING):
+    def _ping_check(self, min_ping=config.DEFAULT_MINIMAL_PING):
         if not self.ping or self.host == 'localhost':
             return True
         ping = sh.ping.bake(self.host, '-c1')
