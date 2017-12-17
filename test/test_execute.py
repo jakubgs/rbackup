@@ -43,9 +43,6 @@ def test_execute(m_signal, proc, piped, timeout, expected):
         assert rval is None
     else:
         assert rval == proc
-    print('WAT:', type(proc.side_effect))
-    print('WTF:', isinstance(proc.side_effect, SHError))
     if proc.side_effect and not isinstance(proc.side_effect, SHError):
         assert proc.terminate.called
         assert proc.kill.called
-

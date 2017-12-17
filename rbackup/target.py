@@ -1,31 +1,26 @@
 import os
+import re
+import sh
 import sys
 from getpass import getuser
 
 from .log import LOG
 from .execute import execute
+# necessary to support python 2.7
 try:
     import config as conf
-    import utils as util
 except:
     from . import config as conf
-    from . import utils as util
-
-try:
-    import sh
-except ImportError:
-    print('Failed to import module "sh". Please install it.')
-    sys.exit(1)
 
 
 class Target(object):
 
-    def __init__(self, id, dest, user=getuser(), host='localhost', port=22, ping=False):
+    def __init__(self, id, dest, user=None, host='localhost', port=22, ping=False):
         assert id is not None
         assert dest is not None
         self.id = id
         self.dest = dest
-        self.user = user
+        self.user = user or getuser()
         self.host = host
         self.port = port
         self.ping = ping
@@ -45,8 +40,6 @@ class Target(object):
         return self._ping_check() and self._ssh_check()
 
     def _ssh_check(self, timeout=1):
-        if not self.host:
-            return True
         host_str = '{}@{}'.format(self.user, self.host)
 
         ssh = sh.ssh.bake(F='/dev/null',  # ignore configuration
@@ -66,7 +59,7 @@ class Target(object):
         return True
 
     def _ping_check(self, min_ping=conf.DEFAULT_MINIMAL_PING):
-        if not self.ping:
+        if not self.ping or self.host == 'localhost':
             return True
         ping = sh.ping.bake(self.host, '-c1')
         LOG.debug('CMD: %s', ping)
@@ -74,7 +67,9 @@ class Target(object):
             r = ping()
         except Exception as e:
             return False
+        print(r.stdout)
         m = re.search(r'time=([^ ]*) ', r.stdout)
+        print(m)
         time = float(m.group(1))
         if time > min_ping:
             LOG.warning('Ping or host too slow({}s), abandoning.'.format(ping))

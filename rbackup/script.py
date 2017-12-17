@@ -5,6 +5,12 @@ import utils as util
 import config as conf
 from log import setup_logging
 
+try:
+    import sh
+except ImportError:
+    print('Failed to import module "sh". Please install it.')
+    sys.exit(1)
+
 
 HELP_MESSAGE = """
 This script backups directories configred as 'assets' in the YAML config file.
