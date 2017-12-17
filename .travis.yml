@@ -3,7 +3,6 @@ env:
   global:
     CODECOV_TOKEN: d2f53ce3-9895-412b-bcbc-39b569d78198
 python:
-  - "2.6"
   - "2.7"
   - "3.5"
   - "3.6"
