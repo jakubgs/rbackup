@@ -1,3 +1,4 @@
+import sys
 from pytest import raises, mark
 from mock import Mock, patch, mock_open
 from unittest import TestCase
@@ -6,6 +7,12 @@ import rbackup.utils as util
 from rbackup.asset import Asset
 from rbackup.target import Target
 
+
+# horrible but necessary to mock open
+open_name = 'builtins.open'
+if sys.version_info[0] < 3:
+    open_name = '__builtin__.open'
+
 @mark.parametrize( ['data', 'expected'], [
     ('Unknown', False),
     ('Discharging', True),
@@ -13,7 +20,8 @@ from rbackup.target import Target
 @patch('rbackup.utils.glob.glob')
 def test_on_battery(m_glob, data, expected):
     m_glob.return_value = ['bat1', 'bat2']
-    with patch('builtins.open', mock_open(read_data=data)) as m_file:
+    print('WTF:', open_name)
+    with patch(open_name, mock_open(read_data=data)) as m_file:
         rval = util.on_battery() 
         assert rval is expected
 
@@ -37,7 +45,7 @@ def test_proc_exists(m_kill, kill_result, expected):
 def test_check_process_(m_isfile, m_proc_exists, file_is, pid):
     m_isfile.return_value = file_is
     m_proc_exists.return_value = pid
-    with patch('builtins.open', mock_open(read_data='1234')) as m_file:
+    with patch(open_name, mock_open(read_data='1234')) as m_file:
         rval = util.check_process('pid_file')
         assert rval == (file_is, pid)
         assert m_proc_exists.calledWith(1234)
@@ -70,7 +78,7 @@ def test_process_is_alone_exit(m_register, m_check_process, m_exit_handler,
     (Mock(side_effect=IOError()),  None),
 ])
 def test_read_config_file(open_mock, expected):
-    with patch('builtins.open', open_mock) as m_file:
+    with patch(open_name, open_mock) as m_file:
         rval = util.read_config_file(['file_a'])
     assert rval == expected
 

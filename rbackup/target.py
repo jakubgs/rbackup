@@ -4,8 +4,13 @@ from getpass import getuser
 
 from .log import LOG
 from .execute import execute
-from . import config as conf
-from . import utils as util
+try:
+    import config as conf
+    import utils as util
+except:
+    from . import config as conf
+    from . import utils as util
+
 try:
     import sh
 except ImportError:
