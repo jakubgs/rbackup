@@ -32,7 +32,7 @@ def asset():
 
 @fixture
 def target():
-    return Target('target_id', '/target/path', host='bkp.example.net')
+    return Target('target_id', '/target/path', host='bkp.example.net', user='testuser')
 
 def test__log_rsync_stats(caplog, rsync_output):
     caplog.set_level(logging.DEBUG)
@@ -46,7 +46,7 @@ def test__log_rsync_stats(caplog, rsync_output):
 
 def test__make_full_dest(asset, target):
     rval = sync._make_full_dest(asset, target)
-    assert rval == 'sochan@bkp.example.net:/target/path/bkp'
+    assert rval == 'testuser@bkp.example.net:/target/path/bkp'
 
 def test__make_full_dest_local(asset, target):
     target.id = 'local'
