@@ -40,42 +40,11 @@ def test_target_constructor():
     (True,  False),
     (False, False),
 ])
-@patch('rbackup.target.Target._ping_check')
-@patch('rbackup.target.Target._ssh_check')
-def test_available(m_ssh_check, m_ping_check, ssh, ping):
-    m_ssh_check.return_value = ssh
-    m_ping_check.return_value = ping
+@patch('rbackup.target.ping_works')
+@patch('rbackup.target.ssh_works')
+def test_available(m_ssh_works, m_ping_works, ssh, ping):
+    m_ssh_works.return_value = ssh
+    m_ping_works.return_value = ping
     t = Target('target_id', '/some/path')
     rval = t.available()
     assert rval == (ssh and ping)
-
-@patch('rbackup.target.sh')
-def test__ssh_check_ok(m_sh):
-    t = Target('target_id', '/some/path')
-    rval = t._ssh_check(timeout=1)
-    assert rval == True
-
-@patch('rbackup.target.sh')
-def test__ssh_check_fail(m_sh):
-    m_sh.ssh.bake.return_value = m_sh
-    m_sh.bake.return_value = m_sh
-    m_sh.exit.side_effect = Exception('TEST')
-    t = Target('target_id', '/some/path')
-    rval = t._ssh_check(timeout=1)
-    assert rval == False
-
-@mark.parametrize(
-    ['ping', 'host',    'sh',                                'expected'], [
-    (True,   'example', Mock(stdout='ttl=64 time=0.123 ms'), True),
-    (True,   'example', Mock(stdout='ttl=64 time=1.123 ms'), False),
-    (True,   'example', Exception('TEST'),                   False),
-    (False,  'example', None,                                True),
-])
-@patch('rbackup.target.sh')
-def test__ping_check_ok(m_sh, ping, host, sh, expected):
-    '64 bytes from localhost icmp_seq=1 '
-    m_sh.ping.bake.return_value = m_sh
-    m_sh.side_effect = [sh]
-    t = Target('target_id', '/some/path', host=host, ping=ping)
-    rval = t._ping_check(min_ping=1)
-    assert rval == expected
