@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
+from rbackup import __version__
 
 setup(
     name='rbackup',
-    version='0.1',
+    version=__version__,
     packages=find_packages(),
 
     author='Some Dude',

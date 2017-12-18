@@ -6,7 +6,7 @@ LOG = logging.getLogger('backup')
 STDOUT_FORMAT = '%(levelname)s: %(message)s'
 FILE_FORMAT = '%(asctime)s - {}'.format(STDOUT_FORMAT)
 
-def setup_logging(log_file, debug=False):
+def setup_logging(log_file=None, debug=False):
     logging.basicConfig(format=STDOUT_FORMAT)
 
     log = logging.getLogger('backup')
@@ -15,9 +15,11 @@ def setup_logging(log_file, debug=False):
     else:
         log.setLevel(logging.INFO)
 
-    fhandler = logging.FileHandler(log_file)
-    fhandler.setFormatter(logging.Formatter(FILE_FORMAT))
-    log.addHandler(fhandler)
+    if log_file:
+        fhandler = logging.FileHandler(log_file)
+        fhandler.setFormatter(logging.Formatter(FILE_FORMAT))
+        log.addHandler(fhandler)
+
     return log
 
 

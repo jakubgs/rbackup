@@ -4,10 +4,7 @@ from os import path
 DEFAULT_CONFIG_FILE_ORDER = [path.join(p, 'rbackup.yaml') for p in [
     '/etc/',                 # system wide
     path.expanduser('~'),    # home
-    path.expanduser('./'),   # local
 ]]
-DEFAULT_PID_FILE = '/tmp/backup.pid'
-DEFAULT_LOG_FILE = '/tmp/backup.log'
 
 # time in seconds that the ping response have to be under
 DEFAULT_MINIMAL_PING = 10

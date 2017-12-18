@@ -44,11 +44,8 @@ def check_process(pid_file):
         return False, None
 
 
-def exit_handler():
-    os.remove(config.DEFAULT_PID_FILE)
-
-
 def process_is_alone(pid_file, force=False):
+    exit_handler = lambda: os.remove(pid_file)
     atexit.register(exit_handler)
     file_is, pid = check_process(pid_file)
     if file_is and pid:

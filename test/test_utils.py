@@ -49,11 +49,6 @@ def test_check_process_(m_isfile, m_proc_exists, file_is, pid):
         assert rval == (file_is, pid)
         assert m_proc_exists.calledWith(1234)
 
-@patch('rbackup.utils.os.remove')
-def test_exit_handler(m_remove):
-    util.exit_handler()
-    assert m_remove.called
- 
 @mark.parametrize(
     ['file_is', 'pid', 'force', 'expected'], [
     (True,      1234,  False,   False),
@@ -61,10 +56,10 @@ def test_exit_handler(m_remove):
     (True,      None,  True,    True),
     (False,     None,  False,   True),
 ])
-@patch('rbackup.utils.exit_handler')
+@patch('rbackup.utils.os.remove')
 @patch('rbackup.utils.check_process')
 @patch('rbackup.utils.atexit.register')
-def test_process_is_alone_exit(m_register, m_check_process, m_exit_handler,
+def test_process_is_alone_exit(m_register, m_check_process, m_remove,
                                file_is, pid, force, expected):
     m_check_process.return_value = (file_is, pid)
     rval = util.process_is_alone('pid_file', force)

@@ -28,7 +28,13 @@ def rsync_output():
 
 @fixture
 def asset():
-    return Asset('asset_id', '/asset/path', target='target_id', dest='bkp')
+    return Asset(
+        'asset_id',
+        '/asset/path',
+        target='target_id',
+        timeout=666,
+        dest='bkp'
+    )
 
 @fixture
 def target():
@@ -59,9 +65,9 @@ def test__bake_rsync_for_target(asset, target):
     rval = sync._bake_rsync_for_target(asset, target)
     assert set(str(rval).split()) == set([
         '/usr/bin/rsync', '--archive', '--recursive', '--update', '--times',
-        '--partial', '--stats', '--timeout=None', '--human-readable',
-        '--delete-after', '--delete-excluded', '--rsh=ssh', '-p', '22',
-        '--test=TEST', '--exclude=something',
+        '--partial', '--stats', '--human-readable', '--delete-after',
+        '--delete-excluded', '--rsh=ssh', '-p', '22',
+        '--test=TEST', '--timeout=666', '--exclude=something',
     ])
 
 @mark.parametrize('type', ['rsync', 'tar'])
