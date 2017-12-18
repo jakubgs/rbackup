@@ -6,6 +6,8 @@ from rbackup.execute import execute
 
 
 def _log_rsync_stats(output):
+    if type(output) == bytes: # pragma: no cover
+        output = output.decode()
     index = output.index('Number of files')
     full_stats = output[index:]
     div = full_stats.index('sent ')
@@ -16,14 +18,14 @@ def _log_rsync_stats(output):
     for line in info_stats.splitlines():
         LOG.info(line)
 
-def _make_full_dest(target, asset):
+def _make_full_dest(asset, target):
     full_dest = '{}/{}'.format(target.dest, asset.dest)
     if target.host:
         return '{}@{}:{}'.format(target.user, target.host, full_dest)
     else:
         return os.path.join(target.dest, asset.dest)
 
-def _bake_rsync_for_target(target, asset, timeout=None, restore=False):
+def _bake_rsync_for_target(asset, target, timeout=None, restore=False):
     # prepare the rsync command
     rsync = sh.rsync.bake(archive=True,
                           recursive=True,
@@ -49,15 +51,16 @@ def _bake_rsync_for_target(target, asset, timeout=None, restore=False):
 
 def sync(asset, target, timeout, restore=False, dryrun=False):
     if asset.type == 'rsync':
-        LOG.debug(rsync(asset, target, timeout, restore, dryrun))
+        stdout = r_sync(asset, target, timeout, restore, dryrun)
     elif asset.type == 'tar':
-        LOG.debug(tar_ssh(asset, target, timeout, restore, dryrun))
+        stdout = tar_ssh(asset, target, timeout, restore, dryrun)
     else:
         raise Exception('No backup type specified for asset: %s', asset.id)
+    LOG.debug(stdout)
 
-def rsync(asset, target, timeout, restore=False, dryrun=False):
-    dest_full = _make_full_dest(asset)
-    rsync = _bake_rsync_for_target(asset, timeout, restore)
+def r_sync(asset, target, timeout, restore=False, dryrun=False):
+    dest_full = _make_full_dest(asset, target)
+    rsync = _bake_rsync_for_target(asset, target, timeout, restore)
 
     # add main arguments, source and destination
     if restore:
@@ -70,7 +73,7 @@ def rsync(asset, target, timeout, restore=False, dryrun=False):
     if dryrun:
         return
 
-    rsync_proc = execute(rsync, timeout)
+    rsync_proc = execute(rsync, timeout=timeout)
     if rsync_proc is not None:
         _log_rsync_stats(rsync_proc.stdout)
         return rsync_proc.stdout

@@ -11,6 +11,12 @@ def test_ssh_works_ok(m_sh):
     assert rval == True
 
 @patch('rbackup.check.sh')
+def test_ssh_works_local(m_sh):
+    t = Target('local', '/some/path')
+    rval = ssh_works(t, timeout=1)
+    assert rval == True
+
+@patch('rbackup.check.sh')
 def test_ssh_works_fail(m_sh):
     m_sh.ssh.bake.return_value = m_sh
     m_sh.bake.return_value = m_sh

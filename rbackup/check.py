@@ -6,6 +6,9 @@ from rbackup.log import LOG
 
 
 def ssh_works(target, timeout=1):
+    if target.id == 'local':
+        return True
+
     host_str = '{}@{}'.format(target.user, target.host)
 
     ssh = sh.ssh.bake(F='/dev/null',  # ignore configuration

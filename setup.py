@@ -32,6 +32,6 @@ setup(
     setup_requires=[
         'mock',
         'pytest',
-        'pytest_cov',
+        'pytest-cov',
     ]
 )
