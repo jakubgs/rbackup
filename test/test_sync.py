@@ -34,15 +34,14 @@ def asset():
 def target():
     return Target('target_id', '/target/path', host='bkp.example.net', user='testuser')
 
-def test__log_rsync_stats(caplog, rsync_output):
-    caplog.set_level(logging.DEBUG)
+@patch('rbackup.sync.LOG')
+def test__log_rsync_stats(m_log, rsync_output):
     sync._log_rsync_stats('\n'.join(rsync_output))
-    for rec in caplog.records:
-        print(rec.levelname, rec.msg)
-        if rec.levelno == logging.INFO:
-            assert 'sent' in rec.msg or 'total size' in rec.msg
-        else:
-            assert rec.msg in rsync_output
+    print(m_log.info.call_args_list[0][0][0])
+    for call in m_log.info.call_args_list:
+        assert 'sent' in call[0][0] or 'total size' in call[0][0]
+    for call in m_log.debug.call_args_list:
+        assert call[0][0] in rsync_output
 
 def test__make_full_dest(asset, target):
     rval = sync._make_full_dest(asset, target)
