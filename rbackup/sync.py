@@ -20,10 +20,10 @@ def _log_rsync_stats(output):
 
 def _make_full_dest(asset, target):
     full_dest = '{}/{}'.format(target.dest, asset.dest)
-    if target.host:
-        return '{}@{}:{}'.format(target.user, target.host, full_dest)
-    else:
+    if target.id == 'local':
         return os.path.join(target.dest, asset.dest)
+    else:
+        return '{}@{}:{}'.format(target.user, target.host, full_dest)
 
 def _bake_rsync_for_target(asset, target, timeout=None, restore=False):
     # prepare the rsync command
@@ -49,16 +49,18 @@ def _bake_rsync_for_target(asset, target, timeout=None, restore=False):
 
     return rsync
 
-def sync(asset, target, timeout, restore=False, dryrun=False):
+def sync(asset, target, timeout=0, restore=False, dryrun=False):
     if asset.type == 'rsync':
-        stdout = r_sync(asset, target, timeout, restore, dryrun)
+        proc = r_sync(asset, target, timeout, restore, dryrun)
     elif asset.type == 'tar':
-        stdout = tar_ssh(asset, target, timeout, restore, dryrun)
+        proc = tar_ssh(asset, target, timeout, restore, dryrun)
     else:
         raise Exception('No backup type specified for asset: %s', asset.id)
-    LOG.debug(stdout)
+    LOG.debug(proc.stdout)
+    return proc
+    
 
-def r_sync(asset, target, timeout, restore=False, dryrun=False):
+def r_sync(asset, target, timeout=0, restore=False, dryrun=False):
     dest_full = _make_full_dest(asset, target)
     rsync = _bake_rsync_for_target(asset, target, timeout, restore)
 
@@ -76,9 +78,10 @@ def r_sync(asset, target, timeout, restore=False, dryrun=False):
     rsync_proc = execute(rsync, timeout=timeout)
     if rsync_proc is not None:
         _log_rsync_stats(rsync_proc.stdout)
-        return rsync_proc.stdout
+        return rsync_proc
 
-def tar_ssh(asset, target, timeout, restore=False, dryrun=False):
+def tar_ssh(asset, target, timeout=0, restore=False, dryrun=False):
+    # TODO add restore mode
     dest_full = '{}/{}.tar.gz'.format(target.dest, asset.dest)
     tar = sh.tar.bake(create=True, gzip=True, total=True,
                       to_stdout=True, warning='no-file-changed')
