@@ -3,5 +3,4 @@ pyyaml
 mock
 pytest
 pytest-cov
-pytest-capturelog
 codecov
