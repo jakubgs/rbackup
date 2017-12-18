@@ -4,8 +4,6 @@ env:
     CODECOV_TOKEN: d2f53ce3-9895-412b-bcbc-39b569d78198
 python:
   - "2.7"
-  - "2.7"
-  - "3.4"
   - "3.5"
   - "3.6"
   - "nightly"
@@ -15,3 +13,7 @@ script:
   - pytest
 after_success:
   - codecov
+notifications:
+  email:
+    on_success: never
+    on_failure: always

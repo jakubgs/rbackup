@@ -1,5 +1,6 @@
 sh
+pyyaml
 mock
 pytest
-pytest_cov
+pytest-cov
 codecov

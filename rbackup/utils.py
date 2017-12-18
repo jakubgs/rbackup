@@ -1,13 +1,14 @@
 import os
+import sys
 import yaml
 import glob
 import select
 import atexit
 
-from asset import Asset
-from target import Target
-import config as conf
-from log import LOG
+from rbackup import config
+from rbackup.log import LOG
+from rbackup.asset import Asset
+from rbackup.target import Target
 
 
 def on_battery():
@@ -15,13 +16,11 @@ def on_battery():
         with open(bat_stat_file) as f:
             if f.read().rstrip() == 'Discharging':
                 return True
-
-
-def exit_handler():
-    os.remove(DEFAULT_PID_FILE)
+    return False
 
 
 def proc_exists(pid):
+    assert isinstance(pid, int)
     try:
         os.kill(pid, 0)
     except Exception as e:
@@ -33,32 +32,36 @@ def check_process(pid_file):
     if os.path.isfile(pid_file):
         pid = None
         with open(pid_file, 'r') as f:
-            pid = f.read()
+            pid = int(f.read())
         if proc_exists(pid):
-            return True, True
+            return True, pid
         else:
-            return True, False
+            return True, None
 
     else:
         with open(pid_file, 'w') as f:
             f.write(str(os.getpid())[:-1])
-        return False, False
+        return False, None
 
 
-def verify_process_is_alone(pid_file):
+def exit_handler():
+    os.remove(config.DEFAULT_PID_FILE)
+
+
+def process_is_alone(pid_file, force=False):
     atexit.register(exit_handler)
-    file_is, process_is = check_process(pid_file)
-    if file_is and process_is:
-        log.warning(
-            'Process already in progress: {} ({})'.format(pid, pid_file))
-        sys.exit(0)
-    elif file_is and not process_is:
-        log.warning('Pid file process is dead: {} ({})'.format(pid, pid_file))
-        if args.force:
-            log.warning('Removing: {}'.format(pid_file))
+    file_is, pid = check_process(pid_file)
+    if file_is and pid:
+        LOG.warning('Process already in progress: %s (%s)', pid, pid_file)
+        return False
+    elif file_is and not pid:
+        LOG.warning('Pid file process is dead: %s (%s)', pid, pid_file)
+        if force:
+            LOG.warning('FORCE mode in effect. Removing: %s', pid_file)
             exit_handler()
         else:
-            sys.exit(0)
+            return False
+    return True
 
 
 def read_config_file(config_files):
@@ -69,8 +72,14 @@ def read_config_file(config_files):
                 return yaml.load(f)
         except IOError as e:
             continue
-    LOG.error('No config file found!')
-    sys.exit(1)
+
+
+def read_config(config_files=config.DEFAULT_CONFIG_FILE_ORDER, stdin=False):
+    config = {}
+    config.update(read_config_file(config_files))
+    if stdin:
+        config.update(read_config_stdin())
+    return config
 
 
 def parse_config(config):
@@ -89,7 +98,7 @@ def parse_config(config):
 
 
 def file_has_input(file):
-    r, w, x = select.select([file], [], [], 0)
+    r, _, _ = select.select([file], [], [], 0)
     if r:
         return True
     else:
@@ -97,29 +106,27 @@ def file_has_input(file):
 
 
 def read_config_stdin():
-    if not sys.stdin.isatty() and file_has_input(sys.stdin):
-        LOG.warning('Reading config from STDIN...')
-        try:
-            return yaml.load(sys.stdin)
-        except ValueError as e:
-            return {}
-    return {}
+    if sys.stdin.isatty():
+        LOG.warning('STDIN is a terminal, ignoring!')
+        return {}
+    if not file_has_input(sys.stdin):
+        LOG.warning('No input found in STDIN!')
+        return {}
+
+    LOG.warning('Reading config from STDIN...')
+    try:
+        return yaml.load(sys.stdin)
+    except ValueError as e:
+        return {}
 
 
-def read_config(config_files=conf.DEFAULT_CONFIG_FILE_ORDER, stdin=False):
-    config = {}
-    config.update(read_config_file(config_files))
-    if stdin:
-        config.update(read_config_stdin())
-    return config
-
-
-def print_config(conf):
+def print_config(assets, targets):
     print('Assets:')
-    for  asset in conf['assets'].values():
-        if asset.get('target', 'local') == 'local':
+    for  asset in assets.values():
+        if asset.target == 'local':
             target = ''
         else:
             target = '{user}@{host}:{port}:{dest}'.format(
-                **conf['targets'][asset['target']])
-        print(' * {id} - {src} -> {0}{dest} ({type})'.format(target, **asset))
+                **vars(targets[asset.target]))
+        print(' * {id} - {src} -> {0}{dest} ({type})'.format(
+            target, **vars(asset)))

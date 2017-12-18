@@ -1,7 +1,8 @@
 import sh
 import time
 import signal
-from log import LOG
+
+from rbackup.log import LOG
 
 class TimeoutException(Exception):
     pass
@@ -51,5 +52,3 @@ def execute(command, piped=None, timeout=None):
         return None
     LOG.info('Finished in: {}s'.format(round(end - start, 2)))
     return proc
-
-

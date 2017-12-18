@@ -1,8 +1,10 @@
 __pycache__
+pytestdebug.log
 dist
 build
 coverage.xml
 .coverage
 .cache
+.eggs
 *.pyc
 *.egg-info

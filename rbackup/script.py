@@ -1,9 +1,15 @@
 import sys
 import argparse
 
-import utils as util 
-import config as conf
-from log import setup_logging
+from rbackup import utils, config
+from rbackup.log import setup_logging
+from rbackup.sync import sync
+
+try:
+    import sh
+except ImportError:
+    print('Failed to import module "sh". Please install it.')
+    sys.exit(1)
 
 
 HELP_MESSAGE = """
@@ -14,7 +20,7 @@ The config is merged with the one read from the file.
 
 Config file locations read in the following order:
 * {}
-""".format('\n* '.join(conf.DEFAULT_CONFIG_FILE_ORDER))
+""".format('\n* '.join(config.DEFAULT_CONFIG_FILE_ORDER))
 
 
 def create_arguments():
@@ -23,15 +29,15 @@ def create_arguments():
                                      description=HELP_MESSAGE)
 
     parser.add_argument( "-a", "--assets", nargs='+', type=str,
-                        default=conf.DEFAULT_PID_FILE,
+                        default=config.DEFAULT_PID_FILE,
                         help="List of assets to process.")
     parser.add_argument("-t", "--type", type=str,
                         help="Type of backup to execute: rsync / tar")
-    parser.add_argument("-T", "--timeout", type=int, default=conf.DEFAULT_TIMEOUT,
+    parser.add_argument("-T", "--timeout", type=int, default=config.DEFAULT_TIMEOUT,
                         help="Time after which rsync command will be stopped.")
-    parser.add_argument("-p", "--pid-file", type=str, default=conf.DEFAULT_PID_FILE,
+    parser.add_argument("-p", "--pid-file", type=str, default=config.DEFAULT_PID_FILE,
                         help="Location of the PID file.")
-    parser.add_argument("-l", "--log-file", type=str, default=conf.DEFAULT_LOG_FILE,
+    parser.add_argument("-l", "--log-file", type=str, default=config.DEFAULT_LOG_FILE,
                         help="Location of the log file.")
     parser.add_argument("-D", "--dryrun", action='store_true',
                         help="Run the code without executing the backup command.")
@@ -50,7 +56,7 @@ def create_arguments():
     parser.add_argument("-f", "--force", action='store_true',
                         help="When used things like running on battery are ignored.")
     parser.add_argument("-c", "--config", type=str,
-                        default=','.join(conf.DEFAULT_CONFIG_FILE_ORDER),
+                        default=','.join(config.DEFAULT_CONFIG_FILE_ORDER),
                         help="Location of YAML config file.")
     return parser.parse_args()
 
@@ -59,17 +65,22 @@ def main():
     opts = create_arguments()
     LOG = setup_logging(opts.log_file, debug=opts.debug)
 
-    conf = util.read_config(opts.config.split(','), opts.stdin)
-    assets, targets = util.parse_config(conf)
+    conf = utils.read_config(opts.config.split(','), opts.stdin)
+    if not conf:
+        LOG.error('No config file found!')
+        sys.exit(1)
+
+    assets, targets = utils.parse_config(conf)
 
     if opts.print_config:
-        util.print_config(conf)
+        utils.print_config(assets, targets)
         sys.exit(0)
 
-    if opts.one_instance:
-        util.verify_process_is_alone(opts.pid_file)
+    if opts.one_instance and not utils.process_is_alone(opts.pid_file, force=opts.force):
+        LOG.warning('Aborting due to use of --one-instance')
+        sys.exit(1)
 
-    if opts.battery_check and not opts.force and util.on_battery():
+    if opts.battery_check and not opts.force and utils.on_battery():
         LOG.warning('System running on battery. Aborting.')
         sys.exit(0)
 
@@ -95,7 +106,7 @@ def main():
         if opts.type:
             asset.type = opts.type
 
-        target.sync(asset, opts.timeout, opts.restore, opts.dryrun)
+        sync(asset, target, opts.timeout, opts.restore, opts.dryrun)
 
 if __name__ == "__main__":
     main()
