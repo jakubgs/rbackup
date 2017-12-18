@@ -58,11 +58,11 @@ def test__bake_rsync_for_target(asset, target):
     asset.opts = {'test': 'TEST'}
     asset.exclude = ['something']
     rval = sync._bake_rsync_for_target(asset, target)
-    assert str(rval) == ' '.join([
-        '/usr/bin/rsync --archive --recursive --update --times',
-        '--partial --stats --timeout=None --human-readable',
-        '--delete-after --delete-excluded --rsh=ssh -p 22',
-        '--test=TEST --exclude=something',
+    assert set(str(rval).split()) == set([
+        '/usr/bin/rsync', '--archive', '--recursive', '--update', '--times',
+        '--partial', '--stats', '--timeout=None', '--human-readable',
+        '--delete-after', '--delete-excluded', '--rsh=ssh', '-p', '22',
+        '--test=TEST', '--exclude=something',
     ])
 
 @mark.parametrize('type', ['rsync', 'tar'])
