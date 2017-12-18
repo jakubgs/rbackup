@@ -10,5 +10,6 @@ install:
   - pip install -r requirements.txt
 script:
   - pytest
+  - pytest-capturelog
 after_success:
   - codecov
