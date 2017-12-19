@@ -15,17 +15,17 @@ Configuration can be also provided through standard input using --stdin flag..
 The config is merged with the one read from the file.
 
 Usage:
-  rbackup save <asset>... [-c CONFIG] [-T TIMEOUT] [-t TYPE] [-p PID_FILE] [-l LOG_FILE] [-D] [-s] [-b] [-f] [-d]
-  rbackup restore <asset>... [-c CONFIG] [-T TIMEOUT] [-t TYPE] [-p PID_FILE] [-l LOG_FILE] [-D] [-s] [-b] [-f] [-d]
+  rbackup (save | restore) <asset>... [-c PATH] [-T SECONDS] [-t TYPE] [-p PATH]
+                                      [-l PATH] [-D] [-s] [-b] [-f] [-d]
   rbackup config
   rbackup -h | --help
   rbackup --version
 
 Options:
-  -c CONFIG --config CONFIG     Location of YAML config file.  [default: {config}]
-  -T TIMEOUT --timeout TIMEOUT  Time after which rsync command will be stopped.
-  -p PID_FILE --pid PID_FILE    Location of the PID file to check for other running instances..
-  -l LOG_FILE --log LOG_FILE    Location of the log file.
+  -c PATH --config PATH         Location of YAML config file.  [default: {config}]
+  -T SECONDS --timeout SECONDS  Time after which rsync command will be stopped.
+  -p PATH --pid PATH            Path of PID file to check for other running instances.
+  -l PATH --log PATH            Path of the log file.
   -t TYPE --type TYPE           Type of backup to execute: rsync / tar
   -D --dryrun                   Run the code without executing the backup command.
   -d --debug                    Enable debug logging.
@@ -41,7 +41,7 @@ Options:
 def main():
     opts = docopt(HELP, version='rbackup 0.1')
 
-    LOG = setup_logging(opts['--log'], debug=opts['--debug'])
+    LOG = setup_logging(log_file=opts['--log'], debug=opts['--debug'])
 
     conf = utils.read_config(opts['--config'].split(','), opts['--stdin'])
     if not conf:
