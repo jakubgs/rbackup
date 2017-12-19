@@ -70,27 +70,28 @@ RBackup ver 0.1
 
 This script backups directories configred as 'assets' in the YAML config file.
 
-Configuration can be also provided through standard input using --stdin flag..
-The config is merged with the one read from the file.
+Configuration can be also provided through standard input using --stdin flag.
+The first found config is merged with the one read from the file.
 
 Usage:
-  rbackup (save | restore) <asset>... [-c PATH] [-T SECONDS] [-t TYPE] [-p PATH]
+  rbackup (save | restore) <asset>... [-c PATH] [-T SECS] [-t TYPE] [-p PATH]
                                       [-l PATH] [-D] [-s] [-b] [-f] [-d]
   rbackup config
   rbackup -h | --help
   rbackup --version
 
 Options:
-  -c PATH --config PATH         Location of YAML config file.  [default: /etc/rbackup.yaml,/home/sochan/rbackup.yaml]
-  -T SECONDS --timeout SECONDS  Time after which rsync command will be stopped.
-  -p PATH --pid PATH            Path of PID file to check for other running instances.
-  -l PATH --log PATH            Path of the log file.
-  -t TYPE --type TYPE           Type of backup to execute: rsync / tar
-  -D --dryrun                   Run the code without executing the backup command.
-  -d --debug                    Enable debug logging.
-  -s --stdin                    Get configuration from STDIN as well.
-  -b --battery-check            Enable checking for battery power before running.
-  -f --force                    When used things like running on battery are ignored.
+  -c PATH --config PATH   Location of YAML config file.
+                          [default: ~/rbackup.yaml,/etc/rbackup.yaml]
+  -T SECS --timeout SECS  Time after which rsync command will be stopped.
+  -p PATH --pid PATH      Path of PID file to check for other running instances.
+  -l PATH --log PATH      Path of the log file.
+  -t TYPE --type TYPE     Type of backup to execute: rsync / tar
+  -D --dryrun             Run the code without executing the backup command.
+  -d --debug              Enable debug logging.
+  -s --stdin              Get configuration from STDIN as well.
+  -b --battery-check      Enable checking for battery power before running.
+  -f --force              When used things like running on battery are ignored.
 ```
 
 # To Do
