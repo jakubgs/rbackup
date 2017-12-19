@@ -25,7 +25,7 @@ def _make_full_dest(asset, target):
     else:
         return '{}@{}:{}'.format(target.user, target.host, full_dest)
 
-def _bake_rsync_for_target(asset, target, timeout=None, restore=False):
+def _bake_rsync_for_target(asset, target, restore=False):
     # prepare the rsync command
     rsync = sh.rsync.bake(archive=True,
                           recursive=True,
@@ -33,7 +33,6 @@ def _bake_rsync_for_target(asset, target, timeout=None, restore=False):
                           times=True,
                           partial=True,
                           stats=True,
-                          timeout=timeout,
                           human_readable=True,
                           delete_after=True,
                           delete_excluded=True)
@@ -41,6 +40,8 @@ def _bake_rsync_for_target(asset, target, timeout=None, restore=False):
     # bake in additional options
     if target.port:
         rsync = rsync.bake(rsh='ssh -p {}'.format(target.port))
+    if asset.timeout:
+        rsync = rsync.bake(timeout=asset.timeout)
     if asset.opts:
         rsync = rsync.bake(asset.opts)
     if asset.exclude:
@@ -49,20 +50,20 @@ def _bake_rsync_for_target(asset, target, timeout=None, restore=False):
 
     return rsync
 
-def sync(asset, target, timeout=0, restore=False, dryrun=False):
+def sync(asset, target, restore=False, dryrun=False):
     if asset.type == 'rsync':
-        proc = r_sync(asset, target, timeout, restore, dryrun)
+        proc = r_sync(asset, target, restore, dryrun)
     elif asset.type == 'tar':
-        proc = tar_ssh(asset, target, timeout, restore, dryrun)
+        proc = tar_ssh(asset, target, restore, dryrun)
     else:
         raise Exception('No backup type specified for asset: %s', asset.id)
     LOG.debug(proc.stdout)
     return proc
     
 
-def r_sync(asset, target, timeout=0, restore=False, dryrun=False):
+def r_sync(asset, target, restore=False, dryrun=False):
     dest_full = _make_full_dest(asset, target)
-    rsync = _bake_rsync_for_target(asset, target, timeout, restore)
+    rsync = _bake_rsync_for_target(asset, target, restore)
 
     # add main arguments, source and destination
     if restore:
@@ -75,12 +76,12 @@ def r_sync(asset, target, timeout=0, restore=False, dryrun=False):
     if dryrun:
         return
 
-    rsync_proc = execute(rsync, timeout=timeout)
+    rsync_proc = execute(rsync, timeout=asset.timeout)
     if rsync_proc is not None:
         _log_rsync_stats(rsync_proc.stdout)
         return rsync_proc
 
-def tar_ssh(asset, target, timeout=0, restore=False, dryrun=False):
+def tar_ssh(asset, target, restore=False, dryrun=False):
     # TODO add restore mode
     dest_full = '{}/{}.tar.gz'.format(target.dest, asset.dest)
     tar = sh.tar.bake(create=True, gzip=True, total=True,
@@ -100,4 +101,4 @@ def tar_ssh(asset, target, timeout=0, restore=False, dryrun=False):
     if dryrun:
         return
 
-    return execute(command, piped=tar, timeout=timeout)
+    return execute(command, piped=tar, timeout=asset.timeout)
