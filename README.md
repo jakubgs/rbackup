@@ -6,6 +6,13 @@ This is a small utility I've made for the purpose of automating backups with `rs
 
 **WARNING:** This package is not yet stable. Use at own peril.
 
+# Why?
+
+I needed something that I could run from cron __and__ manually, log stuff, and that could be also easilly configurable through tools like [Ansible](https://www.ansible.com/). Since the configuration is just a YAML file I can generate it with a trivial template file:
+```
+{{ rbackup_config | to_nice_yaml }}
+```
+
 # Installation
 
 Not available in PyPi yet so you have to install from GitHub:
