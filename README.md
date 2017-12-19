@@ -35,6 +35,10 @@ pip install dist/rbackup-0.1.tar.gz
 Define configuration in YAML format, usually in `/etc/rbackup.yaml`:
 
 ```yaml
+config:
+    log: /tmp/rbackup.log
+    pid: /tmp/rbackup.pid
+    debug: false
 assets:
   - id: example
     type: rsync
@@ -77,9 +81,6 @@ RBackup ver 0.1
 
 This script backups directories configred as 'assets' in the YAML config file.
 
-Configuration can be also provided through standard input using --stdin flag.
-The first found config is merged with the one read from the file.
-
 Usage:
   rbackup (save | restore) <asset>... [-c PATH] [-T SECS] [-t TYPE] [-p PATH]
                                       [-l PATH] [-D] [-s] [-b] [-f] [-d]
@@ -99,6 +100,16 @@ Options:
   -s --stdin              Get configuration from STDIN as well.
   -b --battery-check      Enable checking for battery power before running.
   -f --force              When used things like running on battery are ignored.
+
+Config: 
+  It's a YAML file with a format that includes 2 mandatory keys and 1 optional:
+  
+  * config - Same as CLI arguments you can provide.
+  * assets - Defined assets to backup.
+  * targets - Defines destinatoins for the backups.
+  
+  Configuration can be also provided through standard input using --stdin flag.
+  The first found config is merged with the one read from the file.
 ```
 
 # To Do

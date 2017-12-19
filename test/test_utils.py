@@ -137,3 +137,13 @@ def test_print_config():
         'target_1': Target('target_1', '/another/path'),
     }
     util.print_config(assets, targets)
+
+def test_merge_config_into_opts():
+    opts = {'--debug': False, '--log': '/log/path'}
+    conf = { 'config': {'debug': True, 'pid': '/pid/path'} }
+    rval = util.merge_config_into_opts(conf, opts)
+    assert rval == {
+        '--debug': True,
+        '--log': '/log/path',
+        '--pid': '/pid/path',
+    }

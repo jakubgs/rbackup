@@ -127,3 +127,10 @@ def print_config(assets, targets):
                 **vars(targets[asset.target]))
         print(' * {id} - {src} -> {0}{dest} ({type})'.format(
             target, **vars(asset)))
+
+def merge_config_into_opts(conf, opts):
+    # TODO maybe limit what options we actually merge?
+    for option, value in conf.get('config', {}).items():
+        opts['--'+option] = value
+    return opts
+

@@ -1,4 +1,5 @@
 import sys
+import logging
 import argparse
 from docopt import docopt
 
@@ -10,9 +11,6 @@ from rbackup.sync import sync
 HELP = """RBackup ver {version}
 
 This script backups directories configred as 'assets' in the YAML config file.
-
-Configuration can be also provided through standard input using --stdin flag.
-The first found config is merged with the one read from the file.
 
 Usage:
   rbackup (save | restore) <asset>... [-c PATH] [-T SECS] [-t TYPE] [-p PATH]
@@ -34,6 +32,16 @@ Options:
   -b --battery-check      Enable checking for battery power before running.
   -f --force              When used things like running on battery are ignored.
 
+Config: 
+  It's a YAML file with a format that includes 2 mandatory keys and 1 optional:
+  
+  * config - Same as CLI arguments you can provide.
+  * assets - Defined assets to backup.
+  * targets - Defines destinatoins for the backups.
+  
+  Configuration can be also provided through standard input using --stdin flag.
+  The first found config is merged with the one read from the file.
+
 """.format(
     version=__version__,
     config=','.join(config.DEFAULT_CONFIG_FILE_ORDER)
@@ -42,15 +50,21 @@ Options:
 def main(argv=sys.argv[1:]):
     opts = docopt(HELP, argv=argv, version='rbackup 0.1')
 
-    LOG = setup_logging(log_file=opts['--log'], debug=opts['--debug'])
+    LOG = setup_logging(log_file=opts['--log'])
 
+    print(utils)
     conf = utils.read_config(opts['--config'].split(','), opts['--stdin'])
     if not conf:
         LOG.error('No config file found!')
         sys.exit(1)
 
+    opts = utils.merge_config_into_opts(conf, opts)
+    if opts['--debug']:
+        LOG.setLevel(logging.DEBUG)
+
     assets, targets = utils.parse_config(conf)
 
+    print(opts)
     if opts['config']:
         utils.print_config(assets, targets)
         sys.exit(0)
