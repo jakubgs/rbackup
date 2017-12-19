@@ -38,8 +38,8 @@ Options:
     config=','.join(config.DEFAULT_CONFIG_FILE_ORDER)
 )
 
-def main():
-    opts = docopt(HELP, version='rbackup 0.1')
+def main(argv=sys.argv):
+    opts = docopt(HELP, argv=argv, version='rbackup 0.1')
 
     LOG = setup_logging(log_file=opts['--log'], debug=opts['--debug'])
 
@@ -90,5 +90,5 @@ def main():
 
         sync(asset, target, opts['restore'], opts['--dryrun'])
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     main()

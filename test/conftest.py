@@ -1,3 +1,4 @@
+from mock import patch, Mock
 from pytest import fixture
 
 from rbackup.asset import Asset
@@ -36,9 +37,11 @@ def asset():
 
 @fixture
 def target():
-    return Target(
+    t = Target(
         'target_id',
         '/target/path',
         host='bkp.example.net',
         user='testuser'
     )
+    t.available = Mock(return_value=True)
+    return t
