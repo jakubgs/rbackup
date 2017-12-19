@@ -19,7 +19,6 @@ Or clone it, and build it by hand:
 ```bash
 git clone https://github.com/PonderingGrower/rbackup
 cd rbackup
-./setup.py test
 ./setup.py sdist
 pip install dist/rbackup-0.1.tar.gz
 ```
@@ -46,7 +45,7 @@ targets:
 Now simply run the backup:
 
 ```bash
-$ rbackup --asset example
+$ rbackup save example
 INFO: Starting rsync: /tmp/example -> userx@bkp.example.com:/mnt/backup/example
 INFO: Finished in: 6.22s
 INFO: sent 20.36K bytes  received 15 bytes  3.13K bytes/sec
@@ -56,7 +55,7 @@ INFO: total size is 20.21M  speedup is 991.80
 Or restore:
 
 ```bash
-$ rbackup --asset example --restore
+$ rbackup restore example
 WARNING: Enabled RESTORE mode!
 INFO: Starting rsync: userx@bkp.example.com:/mnt/backup/example -> /tmp/example
 INFO: Finished in: 10.72s
@@ -67,46 +66,35 @@ INFO: total size is 20.21M  speedup is 1.00
 # Help
 
 ```
-usage: rbackup [-h] [-a ASSETS [ASSETS ...]] [-t TYPE] [-T TIMEOUT]
-               [-p PID_FILE] [-l LOG_FILE] [-D] [-o] [-r] [-d] [-s] [-P] [-b]
-               [-f] [-c CONFIG]
+RBackup ver 0.1
 
 This script backups directories configred as 'assets' in the YAML config file.
 
 Configuration can be also provided through standard input using --stdin flag..
 The config is merged with the one read from the file.
 
-Config file locations read in the following order:
-* /etc/rbackup.yaml
-* ~/rbackup.yaml
-* ./rbackup.yaml
+Usage:
+  rbackup (save | restore) <asset>... [-c PATH] [-T SECONDS] [-t TYPE] [-p PATH]
+                                      [-l PATH] [-D] [-s] [-b] [-f] [-d]
+  rbackup config
+  rbackup -h | --help
+  rbackup --version
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -a ASSETS [ASSETS ...], --assets ASSETS [ASSETS ...]
-                        List of assets to process.
-  -t TYPE, --type TYPE  Type of backup to execute: rsync / tar
-  -T TIMEOUT, --timeout TIMEOUT
-                        Time after which rsync command will be stopped.
-  -p PID_FILE, --pid-file PID_FILE
-                        Location of the PID file.
-  -l LOG_FILE, --log-file LOG_FILE
-                        Location of the log file.
-  -D, --dryrun          Run the code without executing the backup command.
-  -o, --one-instance    Check if there is another instance running.
-  -r, --restore         Instead of backing up, restore.
-  -d, --debug           Enable debug logging.
-  -s, --stdin           Get configuration from STDIN as well.
-  -P, --print-config    Show current configuration of sources and targets.
-  -b, --battery-check   Enable checking for battery power before running.
-  -f, --force           When used things like running on battery are ignored.
-  -c CONFIG, --config CONFIG
-                        Location of YAML config file.
+Options:
+  -c PATH --config PATH         Location of YAML config file.  [default: /etc/rbackup.yaml,/home/sochan/rbackup.yaml]
+  -T SECONDS --timeout SECONDS  Time after which rsync command will be stopped.
+  -p PATH --pid PATH            Path of PID file to check for other running instances.
+  -l PATH --log PATH            Path of the log file.
+  -t TYPE --type TYPE           Type of backup to execute: rsync / tar
+  -D --dryrun                   Run the code without executing the backup command.
+  -d --debug                    Enable debug logging.
+  -s --stdin                    Get configuration from STDIN as well.
+  -b --battery-check            Enable checking for battery power before running.
+  -f --force                    When used things like running on battery are ignored.
 ```
 
 # To Do
 
-* Unit tests
 * Functional tests
 * More sane restore mode
 * More types of backups
