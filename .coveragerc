@@ -1,2 +1,4 @@
 [run]
 source=rbackup
+[report]
+precision=2
